@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
+import 'package:url_launcher/url_launcher.dart';
 import 'steamapp.dart';
 import 'package:html/parser.dart' as parse;
 import 'package:html/dom.dart' as dom;
@@ -19,10 +20,6 @@ String parseHTML(String content) {
   return parsed.outerHtml;
 }
 
-String findParagraphs() {
-  String paragraphedHtml;
-
-}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -47,6 +44,14 @@ class MyApp extends StatelessWidget {
   }
 }
 
+void openButton(String url) async {
+  if(await canLaunch(url)) {
+    await (launch(url));
+  } else {
+    throw 'Could not open $url';
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -66,9 +71,17 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+    List<DropdownMenuItem<int>> gamelist = [];
+  void getGames() {
+      gamelist.clear();
+      gamelist.add(new DropdownMenuItem(child: new Text("Team Fortress 2"), value: 440,));
+      gamelist.add(new DropdownMenuItem(child: new Text("CSGO"), value: 750));
+
+  }
 
   @override
   Widget build(BuildContext context) {
+    getGames();
     return MaterialApp(
       title: 'TF2 News App',
       theme: ThemeData(
@@ -76,7 +89,7 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Fetch Data Example'),
+          title: Text('Articles'),
         ),
         body: Center(
           child: FutureBuilder<SteamItem>(
@@ -90,7 +103,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               } else {
                 return ListView.builder(
-
                   itemCount: snapshot.data.newsitems.length,
                   itemBuilder: (BuildContext cont, int index) {
                     if (snapshot.hasData) {
@@ -104,10 +116,17 @@ class _MyHomePageState extends State<MyHomePage> {
                                 subtitle: Text(
                                     snapshot.data.newsitems[index].feed_name),
                               ),
-                              new Text(parseHTML(snapshot.data.newsitems[index].contents)),
+                              new ButtonTheme.bar(
+                                child: new ButtonBar(
+                                  children: <Widget>[
+                                    new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
+                                  ],
+                                )
+                              )
                             ],
                           )
                       );
+
                     } else if (snapshot.hasError) {
                       return Text("${snapshot.error}");
                     }
