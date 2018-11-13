@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 import 'package:url_launcher/url_launcher.dart';
-import 'steamapp.dart';
+import '../lib/steamapp.dart';
 import 'package:html/parser.dart' as parse;
 import 'package:html/dom.dart' as dom;
 void main() => runApp(new MyApp());
@@ -90,68 +90,66 @@ class _MyHomePageState extends State<MyHomePage> {
       home:  DefaultTabController(
         length: 3,
         child: Scaffold(
-            appBar: AppBar(
-              bottom: TabBar(
+          appBar: AppBar(
+            bottom: TabBar(
                 tabs: [
-                  Tab(icon: new Image.asset("imgs/tf2.png"), text: "TF2"),
-                  Tab(icon: new Image.asset('imgs/tf2.png'), text: "CSGO")
-                ]
-              ),
-              title: Text("Valve Games News App"),
+                  Tab(icon: Icon(Icons.title))
+                ],
             ),
-            body: TabBarView(
+            title: Text("Valve Games News App"),
+          ),
+          body: TabBarView(
               children: [
-                Center(
+                  Center(
                   child: FutureBuilder<SteamItem>(
-                    future: getItems(),
-                    builder: (context, snapshot) {
-                      if(snapshot.data == null) {
-                        return new Container(
-                            child: Center(
-                                child: CircularProgressIndicator()
-                            )
-                        );
-                      } else {
-                        return ListView.builder(
-                          itemCount: snapshot.data.newsitems.length,
-                          itemBuilder: (BuildContext cont, int index) {
-                            if (snapshot.hasData) {
-                              return new Card(
-                                  child: new Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      new ListTile(
-                                        leading: const Icon(Icons.format_align_left),
-                                        title: Text(snapshot.data.newsitems[index].title),
-                                        subtitle: Text(
-                                            snapshot.data.newsitems[index].feed_name),
-                                      ),
-                                      new ButtonTheme.bar(
-                                          child: new ButtonBar(
-                                            children: <Widget>[
-                                              new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
-                                            ],
-                                          )
-                                      )
-                                    ],
-                                  )
-                              );
+                      future: getItems(),
+                  builder: (context, snapshot) {
+                    if(snapshot.data == null) {
+                      return new Container(
+                          child: Center(
+                              child: CircularProgressIndicator()
+                          )
+                      );
+                    } else {
+                      return ListView.builder(
+                        itemCount: snapshot.data.newsitems.length,
+                        itemBuilder: (BuildContext cont, int index) {
+                          if (snapshot.hasData) {
+                            return new Card(
+                                child: new Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    new ListTile(
+                                      leading: const Icon(Icons.format_align_left),
+                                      title: Text(snapshot.data.newsitems[index].title),
+                                      subtitle: Text(
+                                          snapshot.data.newsitems[index].feed_name),
+                                    ),
+                                    new ButtonTheme.bar(
+                                        child: new ButtonBar(
+                                          children: <Widget>[
+                                            new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
+                                          ],
+                                        )
+                                    )
+                                  ],
+                                )
+                            );
 
-                            } else if (snapshot.hasError) {
-                              return Text("${snapshot.error}");
-                            }
+                          } else if (snapshot.hasError) {
+                            return Text("${snapshot.error}");
+                          }
 
-                            // By default, show a loading spinner
-                            return CircularProgressIndicator();
-                          },
-                        );
-                      }
-                    },
-                  ),
+                          // By default, show a loading spinner
+                          return CircularProgressIndicator();
+                        },
+                      );
+                    }
+                  },
                 ),
-                Icon(Icons.do_not_disturb)
+              ),
               ],
-            )
+          )
         ),
       ),
     );
