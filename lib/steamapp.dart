@@ -8,9 +8,9 @@ class SteamItem {
 
   SteamItem({this.appid, this.newsitems, this.count});
 
-   Future<http.Response> fetchTF2() async {
+   Future<http.Response> fetchTF2(int requestedid) async {
     final response =
-        await http.get("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002?appid=440");
+        await http.get("http://api.steampowered.com/ISteamNews/GetNewsForApp/v0002?appid=" + requestedid.toString());
 
         if(response.statusCode == 200) {
           print("200 GET CONFIRMED");
@@ -49,7 +49,32 @@ class SteamItem {
 
             newArticle.date = DateTime.fromMicrosecondsSinceEpoch(article['date']);
 
-            newArticle.feed_name = article['feedname'];
+            //Make the names of the feed names more friendly.
+            switch(article['feedname']) {
+              case "rps":
+                newArticle.feed_name = "Rock, Paper, Shotgun";
+                break;
+              case "tf2_blog":
+                newArticle.feed_name = "Team Fortress 2 blog";
+                break;
+              case "steam_updates":
+                newArticle.feed_name = "Update Log";
+                break;
+              case "pcgamer":
+                newArticle.feed_name = "PC Gamer";
+                break;
+              case "eurogamer":
+                newArticle.feed_name = "Euro Gamer";
+                break;
+              case "steam_community_announcements":
+                newArticle.feed_name = "Community Announcement";
+                break;
+              default:
+                newArticle.feed_name = article['feedname'];
+
+            }
+            newArticle.feed_id = article['feedname'];
+
 
             this.newsitems.add(newArticle);
 
@@ -80,6 +105,7 @@ class Article {
   bool is_External_Url;
   String contents;
   String feed_name;
+  String feed_id;
   DateTime date;
 
 }
@@ -87,5 +113,5 @@ class Article {
 void main() {
   SteamItem Item = new SteamItem();
 
-  Item.fetchTF2();
+  Item.fetchTF2(440);
 }

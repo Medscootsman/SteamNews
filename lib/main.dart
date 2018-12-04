@@ -8,9 +8,9 @@ import 'package:html/parser.dart' as parse;
 import 'package:html/dom.dart' as dom;
 void main() => runApp(new MyApp());
 
-Future<SteamItem> getItems() async {
+Future<SteamItem> getItems(int appid) async {
   SteamItem app = new SteamItem();
-  await app.fetchTF2();
+  await app.fetchTF2(appid);
   return app;
 }
 
@@ -52,6 +52,17 @@ void openButton(String url) async {
   }
 }
 
+IconData getIconToUse(String feedID) {
+  switch (feedID){
+    case "steam_updates":
+      return Icons.system_update_alt;
+    case "steam_community_announcements":
+      return Icons.system_update_alt;
+    default:
+      return Icons.format_align_justify;
+  }
+}
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -88,22 +99,25 @@ class _MyHomePageState extends State<MyHomePage> {
         primarySwatch: Colors.blue,
       ),
       home:  DefaultTabController(
-        length: 3,
+        length: 4,
         child: Scaffold(
             appBar: AppBar(
               bottom: TabBar(
                 tabs: [
-                  Tab(icon: new Image.asset("imgs/tf2.png"), text: "TF2"),
-                  Tab(icon: new Image.asset('imgs/tf2.png'), text: "CSGO")
+                  Tab(text: "TF2"),
+                  Tab(text: "CSGO"),
+                  Tab(text: "ARTIFACT"),
+                  Tab(text: "DOTA 2"),
                 ]
               ),
               title: Text("Valve Games News App"),
             ),
             body: TabBarView(
               children: [
+                //TF2 NEWS
                 Center(
                   child: FutureBuilder<SteamItem>(
-                    future: getItems(),
+                    future: getItems(440),
                     builder: (context, snapshot) {
                       if(snapshot.data == null) {
                         return new Container(
@@ -121,7 +135,57 @@ class _MyHomePageState extends State<MyHomePage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: <Widget>[
                                       new ListTile(
-                                        leading: const Icon(Icons.format_align_left),
+                                        leading:
+                                          Icon(getIconToUse(snapshot.data.newsitems[index].feed_id)),
+                                          title: Text(snapshot.data.newsitems[index].title),
+                                          subtitle: Text(
+                                            snapshot.data.newsitems[index].feed_name),
+                                      ),
+                                      new ButtonTheme.bar(
+                                          child: new ButtonBar(
+                                            children: <Widget>[
+                                              new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
+                                            ],
+                                          )
+                                      )
+                                    ],
+                                  )
+                              );
+
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+
+                            // By default, show a loading spinner
+                            return CircularProgressIndicator();
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+                //CSGO NEWS
+                Center(
+                  child: FutureBuilder<SteamItem>(
+                    future: getItems(730),
+                    builder: (context, snapshot) {
+                      if(snapshot.data == null) {
+                        return new Container(
+                            child: Center(
+                                child: CircularProgressIndicator()
+                            )
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data.newsitems.length,
+                          itemBuilder: (BuildContext cont, int index) {
+                            if (snapshot.hasData) {
+                              return new Card(
+                                  child: new Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new ListTile(
+                                        leading: Icon(getIconToUse(snapshot.data.newsitems[index].feed_id)),
                                         title: Text(snapshot.data.newsitems[index].title),
                                         subtitle: Text(
                                             snapshot.data.newsitems[index].feed_name),
@@ -149,7 +213,104 @@ class _MyHomePageState extends State<MyHomePage> {
                     },
                   ),
                 ),
-                Icon(Icons.do_not_disturb)
+                //ARTIFACT NEWS
+                Center(
+                  child: FutureBuilder<SteamItem>(
+                    future: getItems(583950),
+                    builder: (context, snapshot) {
+                      if(snapshot.data == null) {
+                        return new Container(
+                            child: Center(
+                                child: CircularProgressIndicator()
+                            )
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data.newsitems.length,
+                          itemBuilder: (BuildContext cont, int index) {
+                            if (snapshot.hasData) {
+                              return new Card(
+                                  child: new Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new ListTile(
+                                        leading: Icon(getIconToUse(snapshot.data.newsitems[index].feed_id)),
+                                        title: Text(snapshot.data.newsitems[index].title),
+                                        subtitle: Text(
+                                            snapshot.data.newsitems[index].feed_name),
+                                      ),
+                                      new ButtonTheme.bar(
+                                          child: new ButtonBar(
+                                            children: <Widget>[
+                                              new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
+                                            ],
+                                          )
+                                      )
+                                    ],
+                                  )
+                              );
+
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+
+                            // By default, show a loading spinner
+                            return CircularProgressIndicator();
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
+                //DOTA 2 NEWS
+                Center(
+                  child: FutureBuilder<SteamItem>(
+                    future: getItems(570),
+                    builder: (context, snapshot) {
+                      if(snapshot.data == null) {
+                        return new Container(
+                            child: Center(
+                                child: CircularProgressIndicator()
+                            )
+                        );
+                      } else {
+                        return ListView.builder(
+                          itemCount: snapshot.data.newsitems.length,
+                          itemBuilder: (BuildContext cont, int index) {
+                            if (snapshot.hasData) {
+                              return new Card(
+                                  child: new Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: <Widget>[
+                                      new ListTile(
+                                        leading: Icon(getIconToUse(snapshot.data.newsitems[index].feed_id)),
+                                        title: Text(snapshot.data.newsitems[index].title),
+                                        subtitle: Text(
+                                            snapshot.data.newsitems[index].feed_name),
+                                      ),
+                                      new ButtonTheme.bar(
+                                          child: new ButtonBar(
+                                            children: <Widget>[
+                                              new FlatButton(onPressed: () => openButton(snapshot.data.newsitems[index].url), child: new Text("Open Link"))
+                                            ],
+                                          )
+                                      )
+                                    ],
+                                  )
+                              );
+
+                            } else if (snapshot.hasError) {
+                              return Text("${snapshot.error}");
+                            }
+
+                            // By default, show a loading spinner
+                            return CircularProgressIndicator();
+                          },
+                        );
+                      }
+                    },
+                  ),
+                ),
               ],
             )
         ),
